@@ -19,7 +19,7 @@ Alvorens dit uit te voeren, nemen we beter eerst een snapshot.
 
 ### Wat wordt geïnstalleerd
 
-- [x] neofetch
+- [x] fastfetch (of neofetch als fallback)
 - [x] fail2ban (SSH jail, bantime 1h)
 - [x] ufw (poorten: 22, 80, 443, 9000)
 - [x] docker (officieel repository + compose plugin)
@@ -27,6 +27,7 @@ Alvorens dit uit te voeren, nemen we beter eerst een snapshot.
 - [x] portainer (docker compose, HTTP :9000)
 - [x] self-signed certificaat (/opt/ssl/)
 
+- [x] fastfetch/neofetch in `~/.bashrc` (systeeminfo bij login)
 - [x] beide containers starten automatisch op met het systeem (`restart: unless-stopped`)
 
 ### Installatie

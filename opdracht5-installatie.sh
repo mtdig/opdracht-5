@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # opdracht5-installatie.sh
 # Bootstrap-script voor opdracht 5 — groep 99
-# Installeert: neofetch, fail2ban, ufw, docker, vaultwarden, portainer
+# Installeert: fastfetch/neofetch, fail2ban, ufw, docker, vaultwarden, portainer
 
 set -euo pipefail
 
@@ -43,9 +43,16 @@ info "Systeem bijwerken..."
 apt-get update -qq
 apt-get upgrade -y -qq
 
-info "Basispakketten installeren: neofetch, fail2ban, ufw, curl, ca-certificates, gnupg..."
+info "Basispakketten installeren..."
+
+# neofetch is verwijderd sinds Debian 13 / Ubuntu 24.04, fastfetch is de opvolger
+FETCH_PKG="fastfetch"
+if apt-cache show neofetch &>/dev/null; then
+    FETCH_PKG="neofetch"
+fi
+
 apt-get install -y -qq \
-    neofetch \
+    "${FETCH_PKG}" \
     fail2ban \
     ufw \
     curl \
@@ -194,7 +201,25 @@ info "Portainer-container starten..."
 docker compose -f "${PT_COMPOSE_DIR}/docker-compose.yml" up -d
 info "Portainer draait op http://portainer.opdracht5.local:${PORTAINER_PORT}."
 
-# :: 8. /etc/hosts
+# :: 8. fastfetch/neofetch in .bashrc
+BASHRC="${REAL_HOME}/.bashrc"
+if ! grep -q 'fastfetch\|neofetch' "${BASHRC}" 2>/dev/null; then
+    cat >> "${BASHRC}" <<'BASHEOF'
+
+# systeeminfo bij login
+if command -v fastfetch &>/dev/null; then
+    fastfetch
+elif command -v neofetch &>/dev/null; then
+    neofetch
+fi
+BASHEOF
+    chown "${REAL_USER}:${REAL_USER}" "${BASHRC}"
+    info "fastfetch/neofetch toegevoegd aan ${BASHRC}."
+else
+    info "fastfetch/neofetch staat al in ${BASHRC}, overslaan."
+fi
+
+# :: 9. /etc/hosts
 info "/etc/hosts bijwerken..."
 for HOSTNAME in vaultwarden.opdracht5.local portainer.opdracht5.local; do
     if ! grep -q "${HOSTNAME}" /etc/hosts; then
@@ -205,7 +230,7 @@ for HOSTNAME in vaultwarden.opdracht5.local portainer.opdracht5.local; do
     fi
 done
 
-# :: 9. Samenvatting
+# :: 10. Samenvatting
 echo ""
 echo "==========================================="
 echo " Installatie voltooid"
