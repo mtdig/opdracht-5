@@ -8,9 +8,21 @@ set -euo pipefail
 info()  { echo "[INFO]  $*"; }
 err()   { echo "[FOUT]  $*" >&2; exit 1; }
 
+# Wanneer het script via pipe (curl | bash) binnenkomt, bestaat $0 niet als
+# bestand. Sla het dan eerst lokaal op en herstart met sudo.
 if [[ "$(id -u)" -ne 0 ]]; then
+    SELF=$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || true)
+    if [[ -z "${SELF}" || ! -f "${SELF}" ]]; then
+        SELF=$(mktemp /tmp/opdracht5-installatie.XXXXXX.sh)
+        cat > "${SELF}" < /dev/stdin 2>/dev/null || true
+        # stdin is al geconsumeerd; het script draait in geheugen — opnieuw downloaden
+        if [[ ! -s "${SELF}" ]]; then
+            curl -fsSL https://raw.githubusercontent.com/mtdig/opdracht-5/main/opdracht5-installatie.sh > "${SELF}"
+        fi
+        chmod +x "${SELF}"
+    fi
     info "Script heeft root-rechten nodig. Herstarten met sudo..."
-    exec sudo bash "$0" "$@"
+    exec sudo bash "${SELF}" "$@"
 fi
 
 REAL_USER="${SUDO_USER:-$USER}"

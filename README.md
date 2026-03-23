@@ -4,6 +4,11 @@
 
 Omwille van de verscheidenheid aan besturingssystemen en hypervisors, die trouwens al deels geconfigureerd zijn, kozen we voor een bootstrap script dat wordt uitgevoerd binnenin de vm.  
 
+## NOTE
+
+Alvorens dit uit te voeren, nemen we beter eerst een snapshot.
+
+
 ## BASIS 
 
 ### Assumptions
