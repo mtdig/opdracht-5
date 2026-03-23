@@ -14,40 +14,50 @@ Omwille van de verscheidenheid aan besturingssystemen en hypervisors, die trouwe
 
 ### Wat wordt geïnstalleerd
 
-- [ ] neofetch
-- [ ] fail2ban
-- [ ] ufw
-- [ ] docker
-- [ ] vaultwarden (docker compose)
-- [ ] portainer (docker compose)
-- [ ] self-signed certificate
-- [ ] rocket (ROCKET_TLS="{certs=/ssl/cert.pem,key=/ssl/key.pem}")
+- [x] neofetch
+- [x] fail2ban (SSH jail, bantime 1h)
+- [x] ufw (poorten: 22, 80, 443, 9000)
+- [x] docker (officieel repository + compose plugin)
+- [x] vaultwarden (docker compose, HTTPS :443 via ROCKET_TLS)
+- [x] portainer (docker compose, HTTP :9000)
+- [x] self-signed certificaat (/opt/ssl/)
 
-- [ ] beide docker compose containers starten automatisch op met het system
+- [x] beide containers starten automatisch op met het systeem (`restart: unless-stopped`)
 
 ### Installatie
 
-- log aan op je VM met ssh
-- zet deze variabele, met jouw wachtwoord uiteraard
-```bash
-export VM_PASSWORD=osboxes.org
-```
-- zorg dat curl is geïnstalleerd op het systeem
+- log aan op je VM met SSH
+- zorg dat curl is geinstalleerd op het systeem
 ```bash
 sudo apt update && sudo apt install curl -y
 ```
-- installeer de stack met dit commando
+- installeer de stack met dit commando (sudo-wachtwoord wordt gevraagd)
 ```bash
-curl https://github.com/mtdig/opdracht-5/opdracht5-installatie.sh | bash
+curl -fsSL https://raw.githubusercontent.com/mtdig/opdracht-5/main/opdracht5-installatie.sh | bash
 ```
 
 ### Post-Installatie
 
-<ip> vaultwarden.opdracht5.local
-<ip> portainer.opdracht5.local
+Voeg toe aan `/etc/hosts` op je **client** (niet de VM):
+```
+<ip> vaultwarden.opdracht5.local portainer.opdracht5.local
+```
 
+Open in de browser:
+- Vaultwarden: `https://vaultwarden.opdracht5.local` (self-signed cert accepteren)
+- Portainer: `http://portainer.opdracht5.local:9000`
 
-Installeer client / browser extensie
+Installeer de Bitwarden client of browser-extensie en verbind met je Vaultwarden-URL.
+
+### Paden
+
+| Wat | Pad |
+|-----|-----|
+| Vaultwarden compose | `/opt/vaultwarden/docker-compose.yml` |
+| Portainer compose | `/opt/portainer/docker-compose.yml` |
+| Vaultwarden data | `~/.files-vaultwarden/data` |
+| Portainer data | `~/.files-portainer` |
+| Certificaat | `/opt/ssl/cert.pem`, `/opt/ssl/key.pem` |
 
 ### Profit
 
@@ -55,6 +65,8 @@ Installeer client / browser extensie
 
 - [ ] cloud
 - [ ] provisioning met ansible (we vergeten terraform, reasons)
+- [ ] let's encrypt certificates
+- [ ] apache reverse proxy
 - [ ] minetest (FOSS Minecraft clone)
 - [ ] groep99 LAN/WAN-party
 
